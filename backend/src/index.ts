@@ -1,3 +1,8 @@
+import crypto from 'crypto';
+if (!global.crypto) {
+  (global as any).crypto = crypto;
+}
+
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
