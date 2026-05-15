@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class CrudService {
-  private apiUrl = 'http://localhost:3000/api/crud';
+  private apiUrl = 'https://labreport-01ta.onrender.com/api/crud';
 
   constructor(private http: HttpClient) {}
 

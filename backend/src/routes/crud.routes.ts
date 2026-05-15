@@ -18,9 +18,13 @@ const handleCrud = (Model: any) => {
   // READ ALL
   routes.get('/', async (req, res) => {
     try {
+      console.log(`GET ${Model.modelName} query:`, req.query);
       const docs = await Model.find(req.query);
       res.json(docs);
-    } catch (err: any) { res.status(400).json({ error: err.message }); }
+    } catch (err: any) { 
+      console.error(`Error in GET ${Model.modelName}:`, err.message);
+      res.status(400).json({ error: err.message, query: req.query }); 
+    }
   });
   // READ ONE
   routes.get('/:id', async (req, res) => {
@@ -28,21 +32,30 @@ const handleCrud = (Model: any) => {
       const doc = await Model.findById(req.params.id);
       if (!doc) return res.status(404).json({ error: 'Not found' });
       res.json(doc);
-    } catch (err: any) { res.status(400).json({ error: err.message }); }
+    } catch (err: any) { 
+      console.error(`Error in GET ONE ${Model.modelName}:`, err.message);
+      res.status(400).json({ error: err.message }); 
+    }
   });
   // UPDATE
   routes.put('/:id', async (req, res) => {
     try {
       const doc = await Model.findByIdAndUpdate(req.params.id, req.body, { new: true });
       res.json(doc);
-    } catch (err: any) { res.status(400).json({ error: err.message }); }
+    } catch (err: any) { 
+      console.error(`Error in PUT ${Model.modelName}:`, err.message);
+      res.status(400).json({ error: err.message }); 
+    }
   });
   // DELETE
   routes.delete('/:id', async (req, res) => {
     try {
       await Model.findByIdAndDelete(req.params.id);
       res.json({ success: true });
-    } catch (err: any) { res.status(400).json({ error: err.message }); }
+    } catch (err: any) { 
+      console.error(`Error in DELETE ${Model.modelName}:`, err.message);
+      res.status(400).json({ error: err.message }); 
+    }
   });
   return routes;
 };

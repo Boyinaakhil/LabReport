@@ -9,7 +9,7 @@ export class SocketService {
   private socket: Socket;
 
   constructor() {
-    this.socket = io('http://localhost:3000');
+    this.socket = io('https://labreport-01ta.onrender.com');
   }
 
   on(eventName: string): Observable<any> {

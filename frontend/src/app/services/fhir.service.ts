@@ -6,8 +6,8 @@ import { Observable, catchError, map, of, throwError } from 'rxjs';
   providedIn: 'root'
 })
 export class FhirService {
-  private apiUrl = 'http://localhost:3000/api/fhir';
-  private reportUrl = 'http://localhost:3000/api/reports';
+  private apiUrl = 'https://labreport-01ta.onrender.com/api/fhir';
+  private reportUrl = 'https://labreport-01ta.onrender.com/api/reports';
 
   constructor(private http: HttpClient) {}
 
