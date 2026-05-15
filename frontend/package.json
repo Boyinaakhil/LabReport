@@ -21,7 +21,7 @@
     "@angular/platform-browser-dynamic": "^18.2.0",
     "@angular/router": "^18.2.0",
     "@types/pdfmake": "^0.3.2",
-    "apexcharts": "^5.11.0",
+    "apexcharts": "^3.54.1",
     "fhirclient": "^2.6.3",
     "ng-apexcharts": "^1.11.0",
     "pdfmake": "^0.3.8",
