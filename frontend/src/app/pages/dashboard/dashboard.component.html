@@ -1,0 +1,121 @@
+<div class="space-y-6">
+  <!-- Page Header -->
+  <div class="flex justify-between items-end">
+    <div>
+      <h1 class="text-2xl font-bold text-slate-900">Welcome back, John 👋</h1>
+      <p class="text-sm text-slate-500 mt-1">Here is your health overview for this month.</p>
+    </div>
+    <button (click)="downloadSummary()" class="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm flex items-center gap-2">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+      </svg>
+      Download Summary
+    </button>
+  </div>
+
+  <div *ngIf="isLoading()" class="flex justify-center py-20">
+    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+  </div>
+
+  <ng-container *ngIf="!isLoading() && analytics()">
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <!-- Total Reports -->
+      <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-sm font-medium text-slate-500">Total Reports</p>
+            <h3 class="text-2xl font-bold text-slate-900 mt-1">{{analytics().totalReports}}</h3>
+          </div>
+          <div class="p-2 bg-blue-50 rounded-lg text-blue-600">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Normal Reports -->
+      <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-sm font-medium text-slate-500">Normal Results</p>
+            <h3 class="text-2xl font-bold text-slate-900 mt-1">{{analytics().normalReports}}</h3>
+          </div>
+          <div class="p-2 bg-green-50 rounded-lg text-green-600">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Abnormal Reports -->
+      <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-sm font-medium text-slate-500">Abnormal Results</p>
+            <h3 class="text-2xl font-bold text-slate-900 mt-1">{{analytics().abnormalReports}}</h3>
+          </div>
+          <div class="p-2 bg-orange-50 rounded-lg text-orange-600">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Critical Reports -->
+      <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-sm font-medium text-slate-500">Critical Alerts</p>
+            <h3 class="text-2xl font-bold text-red-600 mt-1">{{analytics().criticalReports}}</h3>
+          </div>
+          <div class="p-2 bg-red-50 rounded-lg text-red-600">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI Insights -->
+    <div class="bg-gradient-to-r from-indigo-50 to-blue-50 border border-indigo-100 rounded-xl p-5 shadow-sm">
+      <div class="flex gap-4">
+        <div class="h-10 w-10 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0">
+          <span class="text-indigo-600 font-bold text-lg">AI</span>
+        </div>
+        <div>
+          <h3 class="font-semibold text-slate-900">Health Insights Generated</h3>
+          <ul class="mt-2 space-y-1 text-sm text-slate-700">
+            <li *ngFor="let insight of analytics().insights" class="flex items-center gap-2">
+              <span class="w-1.5 h-1.5 rounded-full" [ngClass]="insight.type === 'positive' ? 'bg-green-500' : 'bg-orange-500'"></span> 
+              {{insight.text}}
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 h-[350px]">
+        <h3 class="font-semibold text-slate-900 mb-4">Biomarker Trends</h3>
+        <apx-chart
+          [series]="trendChartOptions.series"
+          [chart]="trendChartOptions.chart"
+          [xaxis]="trendChartOptions.xaxis"
+          [stroke]="trendChartOptions.stroke"
+          [tooltip]="trendChartOptions.tooltip"
+          [dataLabels]="trendChartOptions.dataLabels"
+        ></apx-chart>
+      </div>
+      <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 h-[350px]">
+        <h3 class="font-semibold text-slate-900 mb-4">Abnormality Distribution</h3>
+        <div class="flex justify-center items-center h-[250px]">
+          <apx-chart
+            [series]="donutChartOptions.series"
+            [chart]="donutChartOptions.chart"
+            [labels]="donutChartOptions.labels"
+            [colors]="donutChartOptions.colors"
+            [dataLabels]="donutChartOptions.dataLabels"
+          ></apx-chart>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</div>

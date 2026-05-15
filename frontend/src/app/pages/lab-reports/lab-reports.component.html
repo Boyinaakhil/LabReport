@@ -1,0 +1,115 @@
+<div class="space-y-6">
+  <!-- Page Header -->
+  <div class="flex justify-between items-end flex-wrap gap-4">
+    <div>
+      <h1 class="text-2xl font-bold text-slate-900">Lab Reports</h1>
+      <p class="text-sm text-slate-500 mt-1">Manage and track all your diagnostic reports.</p>
+    </div>
+    <div class="flex gap-3 flex-wrap">
+      <input type="text" [(ngModel)]="searchQuery" (ngModelChange)="filterData()" placeholder="Search by test or doctor..." class="border border-slate-300 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none">
+      
+      <select [(ngModel)]="filterStatus" (ngModelChange)="filterData()" class="border border-slate-300 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-primary-500 bg-white">
+        <option value="All">All Status</option>
+        <option value="Normal">Normal</option>
+        <option value="Abnormal">Abnormal</option>
+        <option value="Critical">Critical</option>
+        <option value="Pending">Pending</option>
+      </select>
+
+      <button (click)="fetchReports()" class="bg-white border border-slate-300 text-slate-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-50 transition-colors shadow-sm flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+        Refresh
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading()" class="flex justify-center items-center py-20">
+    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error()" class="bg-red-50 text-red-600 p-4 rounded-xl border border-red-200">
+    <p class="font-medium">Error loading reports:</p>
+    <p class="text-sm mt-1">{{error()}}</p>
+    <button (click)="fetchReports()" class="mt-3 bg-red-100 px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-200">Try Again</button>
+  </div>
+
+  <!-- Table Section -->
+  <div *ngIf="!isLoading() && !error()" class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+    
+    <div *ngIf="filteredReports().length === 0" class="p-10 text-center text-slate-500">
+      <p>No reports found matching your criteria.</p>
+    </div>
+
+    <div class="overflow-x-auto" *ngIf="filteredReports().length > 0">
+      <table class="min-w-full divide-y divide-slate-200">
+        <thead class="bg-slate-50">
+          <tr>
+            <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Report Name</th>
+            <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Date</th>
+            <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
+            <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Doctor</th>
+            <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Lab Name</th>
+            <th scope="col" class="px-6 py-4 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-slate-200">
+          <tr *ngFor="let report of filteredReports()" class="hover:bg-slate-50 transition-colors cursor-pointer" [routerLink]="['/reports', report.id]">
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="flex items-center">
+                <div class="flex-shrink-0 h-10 w-10 bg-indigo-50 text-indigo-600 rounded-lg flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                </div>
+                <div class="ml-4">
+                  <div class="text-sm font-medium text-slate-900 truncate max-w-[200px]">{{report.testName}}</div>
+                  <div class="text-sm text-slate-500">{{report.category}}</div>
+                </div>
+              </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm text-slate-900">{{report.date | date:'mediumDate'}}</div>
+              <div class="text-xs text-slate-500">{{report.date | date:'shortTime'}}</div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span class="status-badge" [ngClass]="getStatusClass(report.status)">
+                {{report.status}}
+              </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">
+              {{report.doctor}}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">
+              {{report.lab}}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+              <div class="flex items-center justify-end gap-3">
+                <button (click)="shareReport($event, report)" class="text-slate-500 hover:text-primary-600 bg-slate-100 p-2 rounded-lg" title="Share Report">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
+                </button>
+                <button (click)="downloadPdf($event, report)" class="text-slate-500 hover:text-primary-600 bg-slate-100 p-2 rounded-lg" title="Download PDF">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <!-- Pagination -->
+    <div class="bg-white px-6 py-4 flex items-center justify-between border-t border-slate-200">
+      <div class="flex-1 flex justify-between sm:hidden">
+        <button class="relative inline-flex items-center px-4 py-2 border border-slate-300 text-sm font-medium rounded-md text-slate-700 bg-white hover:bg-slate-50">Previous</button>
+        <button class="ml-3 relative inline-flex items-center px-4 py-2 border border-slate-300 text-sm font-medium rounded-md text-slate-700 bg-white hover:bg-slate-50">Next</button>
+      </div>
+      <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+        <div>
+          <p class="text-sm text-slate-700">
+            Showing <span class="font-medium">{{filteredReports().length}}</span> results
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
