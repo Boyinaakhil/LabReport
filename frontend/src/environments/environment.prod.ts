@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://labreport-01ta.onrender.com/api'
+  apiUrl: 'https://hapi.fhir.org/baseR4'
 };

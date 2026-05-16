@@ -1,26 +1,29 @@
 import { Injectable } from '@angular/core';
-import { io, Socket } from 'socket.io-client';
-import { Observable } from 'rxjs';
+import { Observable, Subject, filter, map } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SocketService {
-  private socket: Socket;
+  private events$ = new Subject<{ eventName: string; data: any }>();
 
-  constructor() {
-    this.socket = io('https://labreport-01ta.onrender.com');
-  }
+  constructor() {}
 
+  // Mock Socket.io "on" method
   on(eventName: string): Observable<any> {
-    return new Observable((subscriber) => {
-      this.socket.on(eventName, (data: any) => {
-        subscriber.next(data);
-      });
-    });
+    return this.events$.pipe(
+      filter(e => e.eventName === eventName),
+      map(e => e.data)
+    );
   }
 
-  emit(eventName: string, data: any) {
-    this.socket.emit(eventName, data);
+  // Mock Socket.io "emit" method
+  emit(eventName: string, data: any): void {
+    // In a real socket, emitting sends to server, which broadcasts to clients.
+    // Since we are frontend only, we just push it straight to our local subject.
+    // We add a tiny delay to simulate network async behavior.
+    setTimeout(() => {
+      this.events$.next({ eventName, data });
+    }, 50);
   }
 }
